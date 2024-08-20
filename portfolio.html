@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Data Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .grid-item {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .title {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .value {
+            font-size: 1.5em;
+            color: #007BFF;
+        }
+
+        .summary {
+            font-size: 1em;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        .graph-container {
+            width: 100%;
+            height: 200px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-size: 1em;
+        }
+
+        #data1 { background-color: #ff9999; }
+        #data2 { background-color: #66b3ff; }
+        #data3 { background-color: #99ff99; }
+        #data4 { background-color: #ffcc99; }
+        #data5 { background-color: #c2c2f0; }
+        #data6 { background-color: #ffb3e6; }
+    </style>
+</head>
+<body>
+    <div class="grid-container">
+        <div class="grid-item" id="data1">
+            <div class="title">Summary</div>
+            <div class="value">1,234</div>
+            <div class="summary">Total Sales for the Month</div>
+        </div>
+        <div class="grid-item" id="data2">
+            <div class="title">S.No</div>
+            <div class="value">001</div>
+            <div class="summary">Order Number</div>
+        </div>
+        <div class="grid-item" id="data3">
+            <div class="title">Company</div>
+            <div class="value">Acme Corp</div>
+            <div class="summary">Company Name</div>
+        </div>
+        <div class="grid-item" id="data4">
+            <div class="title">Graph 1</div>
+            <div class="graph-container">[Graph Placeholder]</div>
+        </div>
+        <div class="grid-item" id="data5">
+            <div class="title">Graph 2</div>
+            <div class="graph-container">[Graph Placeholder]</div>
+        </div>
+        <div class="grid-item" id="data6">
+            <div class="title">Additional Info</div>
+            <div class="value">More Data</div>
+            <div class="summary">Some extra information</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Example of fetching data from an API
+            // Uncomment and replace URL with actual API endpoint when needed
+            /*
+            fetch('https://api.example.com/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('data1').querySelector('.value').textContent = data.summary;
+                    document.getElementById('data2').querySelector('.value').textContent = data.serialNumber;
+                    document.getElementById('data3').querySelector('.value').textContent = data.company;
+                    // Update graphs with actual data if needed
+                })
+                .catch(error => console.error('Error fetching data:', error));
+            */
+        });
+    </script>
+</body>
+</html>

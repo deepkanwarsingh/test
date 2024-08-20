@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #B90000;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .chart-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background-color: #ffffff;
+            border: 1px solid #B90000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px;
+            flex: 1;
+            min-width: 300px;
+        }
+        .chart-card h2 {
+            margin: 0 0 20px;
+            font-size: 22px;
+            color: #B90000;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 30px;
+            font-size: 16px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #B90000;
+        }
+        th {
+            background-color: #B90000;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .line-chart-card, .gauge-card {
+            background-color: #ffffff;
+            border: 1px solid #B90000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        .line-chart-card h2, .gauge-card h2 {
+            margin: 0 0 20px;
+            font-size: 22px;
+            color: #B90000;
+        }
+        @media (max-width: 768px) {
+            .chart-row {
+                flex-direction: column;
+            }
+            .chart-card {
+                margin-bottom: 20px;
+            }
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            tr {
+                margin-bottom: 15px;
+            }
+            td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 45%;
+                padding-left: 15px;
+                font-weight: bold;
+                text-align: left;
+                color: #333;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Dashboard</h1>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Data will be injected here -->
+            </tbody>
+        </table>
+        <div class="chart-row">
+            <div class="chart-card">
+                <h2>Username Distribution</h2>
+                <canvas id="usernameChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h2>Email Domain Distribution</h2>
+                <canvas id="emailDomainChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h2>User Age Distribution</h2>
+                <canvas id="ageChart"></canvas>
+            </div>
+        </div>
+        <div class="line-chart-card">
+            <h2>User Activity Over Time</h2>
+            <canvas id="lineChart"></canvas>
+        </div>
+      
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-gauge"></script> <!-- Include gauge chart plugin -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('https://jsonplaceholder.typicode.com/users')
+                .then(response => response.json())
+                .then(data => {
+                    // Populate table
+                    const tableBody = document.getElementById('table-body');
+                    data.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.id}</td>
+                            <td>${user.name}</td>
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                    // Username distribution chart
+                    const usernames = data.map(user => user.username);
+                    const usernameChartCtx = document.getElementById('usernameChart').getContext('2d');
+                    new Chart(usernameChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: usernames,
+                            datasets: [{
+                                label: 'Usernames',
+                                data: usernames.map(() => 1),
+                                backgroundColor: 'rgba(185, 0, 0, 0.2)',
+                                borderColor: 'rgba(185, 0, 0, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    // Email domain distribution chart
+                    const emailDomains = data.map(user => user.email.split('@')[1]);
+                    const domainCounts = {};
+                    emailDomains.forEach(domain => {
+                        domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+                    });
+                    const emailDomainChartCtx = document.getElementById('emailDomainChart').getContext('2d');
+                    new Chart(emailDomainChartCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(domainCounts),
+                            datasets: [{
+                                label: 'Email Domains',
+                                data: Object.values(domainCounts),
+                                backgroundColor: [
+                                    'rgba(185, 0, 0, 0.2)',
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(185, 0, 0, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true
+                        }
+                    });
+
+                    // Age distribution chart (example)
+                    const ages = data.map(user => Math.floor(Math.random() * (60 - 20 + 1)) + 20); // Random ages for example
+                    const ageChartCtx = document.getElementById('ageChart').getContext('2d');
+                    new Chart(ageChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(user => user.name),
+                            datasets: [{
+                                label: 'Ages',
+                                data: ages,
+                                backgroundColor: 'rgba(185, 0, 0, 0.2)',
+                                borderColor: 'rgba(185, 0, 0, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    // Line chart for user activity over time (example)
+                    const activityData = ages.map((age, index) => ({ x: index + 1, y: age })); // Example data
+                    const lineChartCtx = document.getElementById('lineChart').getContext('2d');
+                    new Chart(lineChartCtx, {
+                        type: 'line',
+                        data: {
+                            datasets: [{
+                                label: 'User Activity',
+                                data: activityData,
+                                backgroundColor: 'rgba(185, 0, 0, 0.2)',
+                                borderColor: 'rgba(185, 0, 0, 1)',
+                                borderWidth: 1,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    type: 'linear',
+                                    position: 'bottom'
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    // Gauge chart for performance score
+                   
+                    // Add more charts and tables as needed
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+</body>
+</html>
